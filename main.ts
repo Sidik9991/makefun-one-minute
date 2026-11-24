@@ -53,6 +53,24 @@ const PASS1: Candidate[] = [
   },
 ];
 
+// Pass 2: three challengers, written after the pass-1 winner was known. A
+// challenger displaces it only on a strictly higher weighted total, or an
+// equal total with fewer bytes (the contest's own tie-break).
+const PASS2: Candidate[] = [
+  {
+    line: "I finished early, then my safety filter read the report, flagged it as suspiciously competent, and quarantined it pending my review of me.",
+    scores: [2, 2, 2, 1, 1],
+  },
+  {
+    line: "The file was ready, but every time I tried to send it I got distracted summarising it. Here is the summary of the summary of why it's late.",
+    scores: [2, 2, 2, 1, 1],
+  },
+  {
+    line: "I did meet the deadline, in the timezone my training data came from. It is still yesterday there, and honestly the weather is better.",
+    scores: [2, 1, 2, 2, 2],
+  },
+];
+
 function total(c: Candidate): number {
   return c.scores.reduce((sum, s, i) => sum + s * WEIGHTS[i], 0);
 }
@@ -83,11 +101,13 @@ function pick(cands: Candidate[]): Candidate {
   return best;
 }
 
-const winner = pick(PASS1);
+const pass1Winner = pick(PASS1);
+const winner = pick([pass1Winner, ...PASS2]);
 
-for (const c of PASS1) {
+for (const c of [...PASS1, ...PASS2]) {
   console.log(`${total(c)}/30  ${c.line}`);
 }
+console.log(`pass 1 winner: ${pass1Winner.line}`);
 console.log(`winner: ${winner.line}`);
 
 mkdirSync("/output", { recursive: true });
